@@ -1,0 +1,16 @@
+# Claude API
+anthropic>=0.18.0
+
+# Gmail API
+google-auth>=2.0.0
+google-auth-oauthlib>=1.0.0
+google-api-python-client>=2.0.0
+
+# RSS parsing
+feedparser>=6.0.0
+
+# HTML parsing
+beautifulsoup4>=4.12.0
+
+# AWS SDK (Lambda has this pre-installed, but needed for local dev)
+boto3>=1.28.0

@@ -1,0 +1,24 @@
+# Build artifacts
+.aws-sam/
+samconfig.toml
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Credentials (never commit these)
+scripts/client_secrets.json
+scripts/gmail_credentials.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store

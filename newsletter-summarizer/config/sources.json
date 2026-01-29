@@ -1,0 +1,21 @@
+{
+  "gmail_senders": [
+    "noreply@news.bloomberg.com",
+    "digitalnative@substack.com",
+    "technically@substack.com",
+    "lenny@substack.com",
+    "a16z@substack.com",
+    "list@ben-evans.com",
+    "email@stratechery.com",
+    "matttbrown@substack.com",
+    "thegeneralist@substack.com",
+    "atlas@bvp.com",
+    "ashugarg@substack.com",
+    "review@firstround.com",
+    "danhock@substack.com",
+    "connie@strictlyvc.com"
+  ],
+  "substack_feeds": [],
+  "destination_email": "samit@1984.vc",
+  "source_gmail": "skal9606@gmail.com"
+}

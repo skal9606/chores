@@ -1,0 +1,18 @@
+# SAM build artifacts
+.aws-sam/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Local credentials (never commit)
+scripts/client_secrets.json
+scripts/gmail_credentials.json
+
+# IDE
+.idea/
+.vscode/
+*.swp

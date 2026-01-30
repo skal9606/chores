@@ -1,0 +1,20 @@
+{
+  "destination_emails": [
+    "samit@1984.vc",
+    "1984bot@1984.vc"
+  ],
+  "filters": {
+    "skip_titles": [
+      "1984 Partner Meeting"
+    ],
+    "skip_internal_domains": [
+      "@1984.vc"
+    ],
+    "skip_vc_patterns": [
+      "@.*vc\\.com",
+      "@.*capital\\.com",
+      "@.*ventures\\.com",
+      "@.*partners\\.com"
+    ]
+  }
+}

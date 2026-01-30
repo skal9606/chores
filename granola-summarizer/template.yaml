@@ -1,0 +1,137 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Granola Meeting Summarizer - Collects meetings via Zapier, sends daily digest at 6pm PST
+
+Globals:
+  Function:
+    Timeout: 60
+    MemorySize: 256
+    Runtime: python3.11
+    Environment:
+      Variables:
+        MEETINGS_TABLE: !Ref MeetingsTable
+        USE_LOCAL_CONFIG: "false"
+
+Resources:
+  # DynamoDB table to store meetings throughout the day
+  MeetingsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: granola-meetings
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: date
+          AttributeType: S
+        - AttributeName: meeting_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: date
+          KeyType: HASH
+        - AttributeName: meeting_id
+          KeyType: RANGE
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+
+  # Webhook Lambda - receives Zapier webhooks and stores meetings
+  WebhookFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: granola-webhook
+      CodeUri: .
+      Handler: src.webhook_handler.lambda_handler
+      Description: Receives Zapier webhooks and stores meetings in DynamoDB
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:PutItem
+              Resource:
+                - !GetAtt MeetingsTable.Arn
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource:
+                - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:granola-summarizer/*"
+      Events:
+        WebhookApi:
+          Type: HttpApi
+          Properties:
+            Path: /webhook
+            Method: POST
+            ApiId: !Ref GranolaApi
+
+  # Digest Lambda - runs at 6pm PST, summarizes all meetings, sends email
+  DigestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: granola-digest
+      CodeUri: .
+      Handler: src.digest_handler.lambda_handler
+      Description: Daily digest - summarizes all meetings and sends email
+      Timeout: 300
+      MemorySize: 512
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Query
+                - dynamodb:DeleteItem
+              Resource:
+                - !GetAtt MeetingsTable.Arn
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource:
+                - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:granola-summarizer/*"
+      Events:
+        DailySchedule:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0 2 * * ? *)  # 6pm PST = 2am UTC
+            Description: Daily meeting digest at 6pm PST
+            Enabled: true
+
+  GranolaApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: prod
+      CorsConfiguration:
+        AllowOrigins:
+          - "*"
+        AllowMethods:
+          - POST
+        AllowHeaders:
+          - "*"
+
+  # CloudWatch Log Groups
+  WebhookLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${WebhookFunction}"
+      RetentionInDays: 14
+
+  DigestLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${DigestFunction}"
+      RetentionInDays: 14
+
+Outputs:
+  WebhookUrl:
+    Description: API Gateway endpoint URL for Zapier webhook
+    Value: !Sub "https://${GranolaApi}.execute-api.${AWS::Region}.amazonaws.com/prod/webhook"
+
+  WebhookFunctionName:
+    Description: Webhook Lambda Function Name
+    Value: !Ref WebhookFunction
+
+  DigestFunctionName:
+    Description: Digest Lambda Function Name
+    Value: !Ref DigestFunction
+
+  MeetingsTableName:
+    Description: DynamoDB table for storing meetings
+    Value: !Ref MeetingsTable

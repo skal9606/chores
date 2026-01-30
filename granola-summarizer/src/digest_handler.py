@@ -36,42 +36,45 @@ def lambda_handler(event: dict, context) -> dict:
         # Get all meetings for today
         meetings = get_meetings_for_date(today)
 
-        if not meetings:
-            logger.info("No meetings to summarize today")
-            return {
-                "statusCode": 200,
-                "body": json.dumps({
-                    "message": "No meetings to summarize",
-                    "date": today,
-                }),
-            }
-
-        logger.info(f"Found {len(meetings)} meetings to summarize")
-
-        # Summarize all meetings
-        summary = summarize_all_meetings(
-            meetings=meetings,
-            api_key=config.anthropic_api_key,
-        )
-
-        if not summary:
-            logger.error("Failed to generate summary")
-            return {
-                "statusCode": 500,
-                "body": json.dumps({"error": "Failed to generate summary"}),
-            }
-
-        # Format and send email
-        email_html = format_digest_email(
-            meetings=meetings,
-            summary=summary,
-            date=today,
-        )
-
         gmail_client = GmailClient(config.gmail_credentials)
-
         today_formatted = datetime.strptime(today, "%Y-%m-%d").strftime("%B %d, %Y")
         subject = f"Daily Meeting Digest - {today_formatted}"
+
+        if not meetings:
+            logger.info("No meetings to summarize today - sending notification email")
+            email_html = f"""
+            <html>
+            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h1 style="color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px;">Daily Meeting Digest</h1>
+                <p style="color: #666; font-size: 14px;">{today_formatted}</p>
+                <div style="background: #f9f9f9; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                    <p style="color: #555; font-size: 16px; margin: 0;">No meeting notes were recorded today.</p>
+                </div>
+            </body>
+            </html>
+            """
+        else:
+            logger.info(f"Found {len(meetings)} meetings to summarize")
+
+            # Summarize all meetings
+            summary = summarize_all_meetings(
+                meetings=meetings,
+                api_key=config.anthropic_api_key,
+            )
+
+            if not summary:
+                logger.error("Failed to generate summary")
+                return {
+                    "statusCode": 500,
+                    "body": json.dumps({"error": "Failed to generate summary"}),
+                }
+
+            # Format email with meeting summaries
+            email_html = format_digest_email(
+                meetings=meetings,
+                summary=summary,
+                date=today,
+            )
 
         # Send to all configured recipients
         successful_sends = []
@@ -92,9 +95,10 @@ def lambda_handler(event: dict, context) -> dict:
         if successful_sends:
             logger.info(f"Successfully sent daily digest to {successful_sends}")
 
-            # Clean up processed meetings
-            deleted = delete_meetings_for_date(today)
-            logger.info(f"Cleaned up {deleted} meetings from DynamoDB")
+            # Clean up processed meetings (only if there were any)
+            if meetings:
+                deleted = delete_meetings_for_date(today)
+                logger.info(f"Cleaned up {deleted} meetings from DynamoDB")
 
             return {
                 "statusCode": 200,

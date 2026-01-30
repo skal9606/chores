@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Ready state -->
+    <div id="ready-state" class="state">
+      <h2>Docsend to PDF</h2>
+      <p id="slide-info">Detecting slides...</p>
+      <button id="download-btn" class="primary-btn" disabled>
+        Download as PDF
+      </button>
+    </div>
+
+    <!-- Progress state -->
+    <div id="progress-state" class="state hidden">
+      <h2>Generating PDF...</h2>
+      <div class="progress-bar">
+        <div id="progress-fill" class="progress-fill"></div>
+      </div>
+      <p id="progress-text">Slide 0 of 0</p>
+    </div>
+
+    <!-- Complete state -->
+    <div id="complete-state" class="state hidden">
+      <h2>Download Complete</h2>
+      <p>Your PDF has been downloaded.</p>
+      <button id="download-again-btn" class="secondary-btn">Download Again</button>
+    </div>
+
+    <!-- Error state -->
+    <div id="error-state" class="state hidden">
+      <h2>Error</h2>
+      <p id="error-message">Something went wrong.</p>
+      <button id="retry-btn" class="secondary-btn">Retry</button>
+    </div>
+
+    <!-- Not on Docsend -->
+    <div id="not-docsend-state" class="state hidden">
+      <h2>Not a Docsend Page</h2>
+      <p>Navigate to a Docsend presentation to use this extension.</p>
+    </div>
+
+    <!-- Auth required -->
+    <div id="auth-required-state" class="state hidden">
+      <h2>Access Required</h2>
+      <p>Please enter your email on the Docsend page first to access this presentation.</p>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

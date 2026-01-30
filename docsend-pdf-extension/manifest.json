@@ -1,0 +1,52 @@
+{
+  "manifest_version": 3,
+  "name": "Docsend to PDF",
+  "version": "1.0.0",
+  "description": "Download Docsend presentations as PDF files with one click",
+
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "downloads"
+  ],
+
+  "host_permissions": [
+    "*://*.docsend.com/*",
+    "*://*.cloudfront.net/*"
+  ],
+
+  "background": {
+    "service_worker": "service_worker.js"
+  },
+
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    },
+    "default_title": "Download Docsend as PDF"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://*.docsend.com/view/*"],
+      "js": ["content/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "icons": {
+    "16": "assets/icons/icon16.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
+  },
+
+  "web_accessible_resources": [
+    {
+      "resources": ["lib/*"],
+      "matches": ["*://*.docsend.com/*"]
+    }
+  ]
+}

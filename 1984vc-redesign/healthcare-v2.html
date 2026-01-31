@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1984 Founder Clinic - Healthcare AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Special+Elite&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Space+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper-cream: #f4efe4;
+            --paper-aged: #e8e0d0;
+            --ink-blue: #1a365d;
+            --ink-black: #2d2d2d;
+            --stamp-red: #c41e3a;
+            --pencil-gray: #4a4a4a;
+            --highlight-yellow: #fff3a3;
+            --medical-teal: #2a6b6b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Libre Baskerville', serif;
+            background: #8b7355;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        /* Wood desk texture background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                repeating-linear-gradient(
+                    90deg,
+                    transparent 0px,
+                    transparent 50px,
+                    rgba(0,0,0,0.03) 50px,
+                    rgba(0,0,0,0.03) 51px
+                ),
+                linear-gradient(180deg, #7a6548 0%, #8b7355 50%, #6d5a42 100%);
+            z-index: -1;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            z-index: 100;
+            background: var(--paper-cream);
+            border: none;
+            color: var(--ink-blue);
+            padding: 0.75rem 1.5rem;
+            font-family: 'Special Elite', monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+            transition: transform 0.2s ease;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Main Clipboard */
+        .clipboard {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Clipboard clip at top */
+        .clipboard-clip {
+            width: 120px;
+            height: 40px;
+            background: linear-gradient(180deg, #8b7355 0%, #6d5a42 100%);
+            margin: 0 auto -10px;
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+        }
+
+        .clipboard-clip::before {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 20px;
+            background: linear-gradient(180deg, #a0a0a0 0%, #707070 100%);
+            border-radius: 3px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Paper stack */
+        .paper-stack {
+            position: relative;
+            background: var(--paper-cream);
+            padding: 3rem 3rem 2rem;
+            box-shadow:
+                0 1px 1px rgba(0,0,0,0.1),
+                0 2px 2px rgba(0,0,0,0.1),
+                0 4px 4px rgba(0,0,0,0.1),
+                0 8px 8px rgba(0,0,0,0.1),
+                5px 5px 0 var(--paper-aged),
+                6px 6px 0 rgba(0,0,0,0.05),
+                10px 10px 0 #e0d8c8,
+                11px 11px 0 rgba(0,0,0,0.05);
+        }
+
+        /* Paper texture */
+        .paper-stack::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+        }
+
+        /* Red margin line */
+        .paper-stack::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 80px;
+            width: 2px;
+            background: rgba(196, 30, 58, 0.3);
+        }
+
+        /* Header with letterhead */
+        .letterhead {
+            text-align: center;
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .letterhead::before {
+            content: '+';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 4rem;
+            color: var(--stamp-red);
+            opacity: 0.15;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+        }
+
+        .clinic-title {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 1.8rem;
+            color: var(--ink-blue);
+            letter-spacing: 0.1em;
+            margin-bottom: 0.25rem;
+        }
+
+        .clinic-subtitle {
+            font-family: 'Special Elite', monospace;
+            font-size: 0.8rem;
+            color: var(--pencil-gray);
+            letter-spacing: 0.15em;
+        }
+
+        .clinic-address {
+            font-family: 'Libre Baskerville', serif;
+            font-style: italic;
+            font-size: 0.75rem;
+            color: var(--pencil-gray);
+            margin-top: 0.5rem;
+        }
+
+        /* Form styling */
+        .intake-form {
+            position: relative;
+        }
+
+        .form-title {
+            font-family: 'Special Elite', monospace;
+            font-size: 1rem;
+            color: var(--ink-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--ink-blue);
+            display: inline-block;
+        }
+
+        .form-row {
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .form-label {
+            font-family: 'Special Elite', monospace;
+            font-size: 0.8rem;
+            color: var(--ink-black);
+            min-width: 140px;
+            padding-top: 0.5rem;
+        }
+
+        .form-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.5rem 0;
+            font-family: 'Caveat', cursive;
+            font-size: 1.4rem;
+            color: var(--ink-blue);
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--pencil-gray);
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-bottom-color: var(--ink-blue);
+            border-bottom-width: 2px;
+        }
+
+        .form-input::placeholder {
+            color: #bbb;
+            font-style: italic;
+        }
+
+        textarea.form-input {
+            min-height: 80px;
+            resize: none;
+            line-height: 1.8;
+            background-image: repeating-linear-gradient(
+                transparent,
+                transparent 27px,
+                #ccc 27px,
+                #ccc 28px
+            );
+            background-position: 0 8px;
+        }
+
+        select.form-input {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231a365d' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0 center;
+        }
+
+        /* Checkbox section */
+        .checkbox-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: rgba(0,0,0,0.02);
+            border: 1px dashed rgba(0,0,0,0.2);
+        }
+
+        .checkbox-title {
+            font-family: 'Special Elite', monospace;
+            font-size: 0.85rem;
+            color: var(--ink-black);
+            margin-bottom: 1rem;
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-family: 'Libre Baskerville', serif;
+            font-size: 0.9rem;
+            color: var(--ink-black);
+        }
+
+        .custom-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--pencil-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-item input {
+            display: none;
+        }
+
+        .checkbox-item input:checked + .custom-checkbox {
+            background: transparent;
+        }
+
+        .checkbox-item input:checked + .custom-checkbox::after {
+            content: '✓';
+            font-family: 'Caveat', cursive;
+            font-size: 1.2rem;
+            color: var(--ink-blue);
+            font-weight: bold;
+        }
+
+        /* Date stamp */
+        .date-stamp {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-family: 'Special Elite', monospace;
+            font-size: 0.8rem;
+            color: var(--stamp-red);
+            transform: rotate(12deg);
+            border: 2px solid var(--stamp-red);
+            padding: 0.25rem 0.5rem;
+            opacity: 0.7;
+        }
+
+        /* Submit button */
+        .submit-btn {
+            display: block;
+            width: 100%;
+            margin-top: 2rem;
+            padding: 1rem;
+            font-family: 'Special Elite', monospace;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            background: var(--ink-blue);
+            color: var(--paper-cream);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .submit-btn:hover {
+            background: #0f2440;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        /* Prescription Pad Result */
+        .prescription-result {
+            display: none;
+            margin-top: 2rem;
+            position: relative;
+        }
+
+        .prescription-result.active {
+            display: block;
+            animation: fadeSlideIn 0.6s ease;
+        }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .prescription-pad {
+            background: #fff;
+            padding: 2rem;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        /* Prescription header */
+        .rx-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--medical-teal);
+        }
+
+        .rx-symbol {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 3rem;
+            color: var(--medical-teal);
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .rx-clinic-info {
+            text-align: right;
+        }
+
+        .rx-clinic-name {
+            font-family: 'Libre Baskerville', serif;
+            font-weight: bold;
+            color: var(--ink-blue);
+        }
+
+        .rx-clinic-details {
+            font-family: 'Special Elite', monospace;
+            font-size: 0.7rem;
+            color: var(--pencil-gray);
+            margin-top: 0.25rem;
+        }
+
+        /* Patient info */
+        .rx-patient {
+            margin-bottom: 1.5rem;
+            font-family: 'Special Elite', monospace;
+            font-size: 0.85rem;
+            color: var(--pencil-gray);
+        }
+
+        .rx-patient-name {
+            font-family: 'Caveat', cursive;
+            font-size: 1.5rem;
+            color: var(--ink-blue);
+        }
+
+        /* Prescription body */
+        .rx-body {
+            min-height: 200px;
+            padding: 1rem;
+            background: repeating-linear-gradient(
+                transparent,
+                transparent 27px,
+                #e8e8e8 27px,
+                #e8e8e8 28px
+            );
+        }
+
+        .rx-diagnosis {
+            font-family: 'Caveat', cursive;
+            font-size: 1.3rem;
+            color: var(--ink-blue);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .rx-metrics {
+            display: flex;
+            gap: 2rem;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: var(--highlight-yellow);
+        }
+
+        .rx-metric {
+            text-align: center;
+        }
+
+        .rx-metric-value {
+            font-family: 'Caveat', cursive;
+            font-size: 2rem;
+            color: var(--stamp-red);
+            font-weight: bold;
+        }
+
+        .rx-metric-label {
+            font-family: 'Special Elite', monospace;
+            font-size: 0.65rem;
+            color: var(--pencil-gray);
+            text-transform: uppercase;
+        }
+
+        .rx-instructions {
+            margin-top: 1.5rem;
+        }
+
+        .rx-instructions-title {
+            font-family: 'Special Elite', monospace;
+            font-size: 0.8rem;
+            color: var(--ink-black);
+            margin-bottom: 0.5rem;
+        }
+
+        .rx-instruction-item {
+            font-family: 'Caveat', cursive;
+            font-size: 1.2rem;
+            color: var(--ink-blue);
+            padding: 0.25rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .rx-instruction-item::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+        }
+
+        /* Signature area */
+        .rx-footer {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .rx-date {
+            font-family: 'Special Elite', monospace;
+            font-size: 0.8rem;
+            color: var(--pencil-gray);
+        }
+
+        .rx-signature {
+            text-align: center;
+        }
+
+        .rx-sig-line {
+            width: 200px;
+            border-bottom: 1px solid var(--ink-black);
+            margin-bottom: 0.25rem;
+        }
+
+        .rx-sig-name {
+            font-family: 'Caveat', cursive;
+            font-size: 1.5rem;
+            color: var(--ink-blue);
+            position: relative;
+            top: -10px;
+        }
+
+        .rx-sig-title {
+            font-family: 'Special Elite', monospace;
+            font-size: 0.7rem;
+            color: var(--pencil-gray);
+        }
+
+        /* Stamps */
+        .stamp {
+            position: absolute;
+            font-family: 'Special Elite', monospace;
+            text-transform: uppercase;
+            padding: 0.5rem 1rem;
+            border: 3px solid;
+            transform: rotate(-15deg);
+            opacity: 0.8;
+        }
+
+        .stamp-approved {
+            top: 50px;
+            right: 30px;
+            color: #228b22;
+            border-color: #228b22;
+            font-size: 1.2rem;
+        }
+
+        .stamp-priority {
+            bottom: 100px;
+            left: 20px;
+            color: var(--stamp-red);
+            border-color: var(--stamp-red);
+            font-size: 0.9rem;
+            transform: rotate(8deg);
+        }
+
+        /* CTA Button */
+        .rx-cta {
+            display: block;
+            width: 100%;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: var(--stamp-red);
+            color: white;
+            font-family: 'Special Elite', monospace;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .rx-cta:hover {
+            background: #a01830;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
+        }
+
+        /* Coffee stain */
+        .coffee-stain {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: radial-gradient(ellipse at center,
+                transparent 40%,
+                rgba(139, 90, 43, 0.1) 45%,
+                rgba(139, 90, 43, 0.15) 50%,
+                rgba(139, 90, 43, 0.1) 55%,
+                transparent 60%
+            );
+            bottom: 20px;
+            left: 30px;
+            pointer-events: none;
+        }
+
+        /* Paper clip */
+        .paper-clip {
+            position: absolute;
+            top: -15px;
+            right: 60px;
+            width: 30px;
+            height: 70px;
+            border: 3px solid #888;
+            border-radius: 15px 15px 5px 5px;
+            transform: rotate(5deg);
+        }
+
+        .paper-clip::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 5px;
+            right: 5px;
+            bottom: 10px;
+            border: 3px solid #888;
+            border-radius: 10px 10px 3px 3px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .paper-stack {
+                padding: 2rem 1.5rem;
+            }
+
+            .paper-stack::after {
+                left: 40px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .form-label {
+                min-width: auto;
+            }
+
+            .checkbox-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .rx-metrics {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.location.href='index.html'">← Back to Home</button>
+
+    <div class="clipboard">
+        <div class="clipboard-clip"></div>
+        <div class="paper-clip"></div>
+
+        <div class="paper-stack">
+            <div class="date-stamp" id="dateStamp"></div>
+            <div class="coffee-stain"></div>
+
+            <div class="letterhead">
+                <h1 class="clinic-title">1984 Founder Clinic</h1>
+                <p class="clinic-subtitle">Startup Diagnostic Services</p>
+                <p class="clinic-address">San Francisco, CA • Since 2016 • "We see what others miss"</p>
+            </div>
+
+            <form class="intake-form" id="intakeForm">
+                <h2 class="form-title">Patient Intake Form</h2>
+
+                <div class="form-row">
+                    <label class="form-label">Company Name:</label>
+                    <div class="form-input-wrapper">
+                        <input type="text" class="form-input" id="companyName" placeholder="Your company name..." required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">Chief Complaint:</label>
+                    <div class="form-input-wrapper">
+                        <textarea class="form-input" id="problem" placeholder="What healthcare problem are you solving?" required></textarea>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">Stage:</label>
+                    <div class="form-input-wrapper">
+                        <select class="form-input" id="stage" required>
+                            <option value="">Select stage...</option>
+                            <option value="idea">Pre-Seed (Idea Stage)</option>
+                            <option value="mvp">Seed (MVP)</option>
+                            <option value="growth">Series A (Growth)</option>
+                            <option value="scale">Series B+ (Scale)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="checkbox-section">
+                    <p class="checkbox-title">Please check all applicable areas:</p>
+                    <div class="checkbox-grid">
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="vertical" value="clinical">
+                            <span class="custom-checkbox"></span>
+                            Clinical Workflow
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="vertical" value="diagnostics">
+                            <span class="custom-checkbox"></span>
+                            Diagnostics & Imaging
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="vertical" value="pharma">
+                            <span class="custom-checkbox"></span>
+                            Pharma & Drug Discovery
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="vertical" value="payer">
+                            <span class="custom-checkbox"></span>
+                            Payer & Insurance
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="vertical" value="consumer">
+                            <span class="custom-checkbox"></span>
+                            Consumer Health
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="vertical" value="infrastructure">
+                            <span class="custom-checkbox"></span>
+                            Health Data Infrastructure
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">Monthly Revenue:</label>
+                    <div class="form-input-wrapper">
+                        <input type="text" class="form-input" id="mrr" placeholder="$0 - $X,XXX,XXX">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">Team Size:</label>
+                    <div class="form-input-wrapper">
+                        <input type="number" class="form-input" id="teamSize" placeholder="Number of people">
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Submit for Diagnosis →</button>
+            </form>
+
+            <!-- Prescription Result -->
+            <div class="prescription-result" id="prescriptionResult">
+                <div class="prescription-pad">
+                    <div class="stamp stamp-approved">Pre-Qualified</div>
+                    <div class="stamp stamp-priority">Priority Review</div>
+
+                    <div class="rx-header">
+                        <div class="rx-symbol">℞</div>
+                        <div class="rx-clinic-info">
+                            <div class="rx-clinic-name">1984 Founder Clinic</div>
+                            <div class="rx-clinic-details">Startup Diagnostic Services<br>License #VC-1984</div>
+                        </div>
+                    </div>
+
+                    <div class="rx-patient">
+                        PATIENT: <span class="rx-patient-name" id="rxPatient"></span>
+                    </div>
+
+                    <div class="rx-body">
+                        <div class="rx-diagnosis" id="rxDiagnosis"></div>
+
+                        <div class="rx-metrics">
+                            <div class="rx-metric">
+                                <div class="rx-metric-value" id="rxFit">--</div>
+                                <div class="rx-metric-label">Founder-Market Fit</div>
+                            </div>
+                            <div class="rx-metric">
+                                <div class="rx-metric-value" id="rxPotential">--</div>
+                                <div class="rx-metric-label">Market Potential</div>
+                            </div>
+                            <div class="rx-metric">
+                                <div class="rx-metric-value" id="rxReady">--</div>
+                                <div class="rx-metric-label">Investment Ready</div>
+                            </div>
+                        </div>
+
+                        <div class="rx-instructions">
+                            <p class="rx-instructions-title">TREATMENT PROTOCOL:</p>
+                            <div id="rxInstructions"></div>
+                        </div>
+                    </div>
+
+                    <div class="rx-footer">
+                        <div class="rx-date" id="rxDate"></div>
+                        <div class="rx-signature">
+                            <div class="rx-sig-line">
+                                <span class="rx-sig-name">Dr. Venture Capital</span>
+                            </div>
+                            <div class="rx-sig-title">Partner, Healthcare Practice</div>
+                        </div>
+                    </div>
+
+                    <a href="https://apply.1984.vc" target="_blank" class="rx-cta">
+                        → Fill This Prescription (Apply Now)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set date stamp
+        const today = new Date();
+        document.getElementById('dateStamp').textContent = today.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        }).toUpperCase();
+
+        // Form submission
+        document.getElementById('intakeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const companyName = document.getElementById('companyName').value;
+            const problem = document.getElementById('problem').value;
+            const stage = document.getElementById('stage').value;
+            const verticals = Array.from(document.querySelectorAll('input[name="vertical"]:checked')).map(el => el.value);
+
+            // Generate scores
+            const fitScore = Math.floor(Math.random() * 15) + 85;
+            const potentials = ['A+', 'A', 'A-'];
+            const readyLevels = ['Yes', 'Strong', 'Ready'];
+
+            const verticalNames = {
+                clinical: 'clinical workflow',
+                diagnostics: 'diagnostics',
+                pharma: 'pharma',
+                payer: 'payer tech',
+                consumer: 'consumer health',
+                infrastructure: 'health data'
+            };
+
+            const selectedVerticals = verticals.map(v => verticalNames[v]).join(', ') || 'healthcare';
+
+            // Fill prescription
+            document.getElementById('rxPatient').textContent = companyName;
+            document.getElementById('rxFit').textContent = fitScore + '%';
+            document.getElementById('rxPotential').textContent = potentials[Math.floor(Math.random() * potentials.length)];
+            document.getElementById('rxReady').textContent = readyLevels[Math.floor(Math.random() * readyLevels.length)];
+
+            document.getElementById('rxDiagnosis').innerHTML =
+                `Dx: Strong founder-market fit detected in ${selectedVerticals}.<br><br>` +
+                `Assessment indicates healthy vital signs for early-stage investment consideration. ` +
+                `Patient demonstrates clear understanding of market dynamics and regulatory pathways. ` +
+                `Recommend proceeding with full diagnostic workup.`;
+
+            const instructions = [
+                'Schedule partner consultation (30 min)',
+                'Prepare pitch deck for detailed analysis',
+                'Gather clinical validation data',
+                'Connect with portfolio company mentors',
+                'Complete due diligence documentation'
+            ];
+
+            const instructionsEl = document.getElementById('rxInstructions');
+            instructionsEl.innerHTML = '';
+            instructions.forEach(instruction => {
+                const item = document.createElement('div');
+                item.className = 'rx-instruction-item';
+                item.textContent = instruction;
+                instructionsEl.appendChild(item);
+            });
+
+            document.getElementById('rxDate').textContent = 'Date: ' + today.toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+            });
+
+            // Show result
+            document.getElementById('prescriptionResult').classList.add('active');
+            document.getElementById('prescriptionResult').scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

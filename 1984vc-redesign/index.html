@@ -1,0 +1,2132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1984 Ventures - The Future is Being Built</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;700&family=Space+Mono:wght@400;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --red-primary: #E63946;
+            --red-dark: #B91C2A;
+            --red-light: #FF6B6B;
+            --blue-primary: #1D3557;
+            --blue-dark: #0D1B2A;
+            --blue-light: #457B9D;
+            --cream: #F1FAEE;
+            --off-white: #FEFEFE;
+            --terminal-green: #00FF41;
+            --terminal-amber: #FFB000;
+            --healthcare-teal: #2DD4BF;
+            --paper-bg: #F5F5DC;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Space Mono', monospace;
+            background: var(--blue-dark);
+            color: var(--cream);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Noise overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* ============================================
+           MAIN LANDING PAGE
+           ============================================ */
+        .landing-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            padding: 2rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo {
+            font-family: 'Anton', sans-serif;
+            font-size: 3rem;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+        }
+
+        .logo-year {
+            color: var(--red-primary);
+        }
+
+        .logo-vc {
+            font-size: 1.5rem;
+            color: var(--blue-light);
+            opacity: 0.7;
+        }
+
+        .tagline {
+            font-family: 'Crimson Pro', serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            color: var(--cream);
+            opacity: 0.6;
+        }
+
+        .hero-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 4rem 4rem;
+        }
+
+        .hero-text {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(2rem, 6vw, 4.5rem);
+            line-height: 1.1;
+            margin-bottom: 3rem;
+            max-width: 700px;
+        }
+
+        .hero-text .highlight-red {
+            color: var(--red-primary);
+        }
+
+        .hero-text .highlight-blue {
+            color: var(--blue-light);
+        }
+
+        /* The Three Tiles */
+        .tiles-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .tile {
+            position: relative;
+            height: 400px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+            border: 3px solid transparent;
+        }
+
+        .tile::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: inherit;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .tile:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+        }
+
+        .tile:hover::before {
+            transform: scale(1.1);
+        }
+
+        /* Tile 1: Vertical AI - Red dominant */
+        .tile-vertical-ai {
+            background: linear-gradient(135deg, var(--red-primary) 0%, var(--red-dark) 100%);
+            border-color: var(--red-light);
+        }
+
+        .tile-vertical-ai::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 40px,
+                    rgba(255,255,255,0.03) 40px,
+                    rgba(255,255,255,0.03) 41px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 40px,
+                    rgba(255,255,255,0.03) 40px,
+                    rgba(255,255,255,0.03) 41px
+                );
+        }
+
+        /* Tile 2: Healthcare - Blue with medical cross pattern */
+        .tile-healthcare {
+            background: linear-gradient(135deg, var(--blue-primary) 0%, var(--blue-dark) 100%);
+            border-color: var(--blue-light);
+        }
+
+        .tile-healthcare::after {
+            content: '+';
+            position: absolute;
+            font-family: 'Anton', sans-serif;
+            font-size: 300px;
+            color: rgba(255,255,255,0.05);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Tile 3: Infrastructure - Terminal aesthetic */
+        .tile-infra {
+            background: linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 100%);
+            border-color: var(--terminal-green);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .tile-infra::after {
+            content: '>';
+            position: absolute;
+            font-size: 200px;
+            color: var(--terminal-green);
+            opacity: 0.1;
+            bottom: -30px;
+            right: 20px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 0.1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .tile-content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .tile-number {
+            font-family: 'Anton', sans-serif;
+            font-size: 6rem;
+            line-height: 1;
+            opacity: 0.3;
+        }
+
+        .tile-title {
+            font-family: 'Anton', sans-serif;
+            font-size: 2.5rem;
+            line-height: 1.1;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .tile-subtitle {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1rem;
+            opacity: 0.7;
+            margin-top: 0.5rem;
+        }
+
+        .tile-arrow {
+            font-size: 2rem;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.3s ease;
+        }
+
+        .tile:hover .tile-arrow {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Surveillance decorative elements */
+        .surveillance-eye {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            border: 2px solid var(--red-primary);
+            border-radius: 50%;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .surveillance-eye::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background: var(--red-primary);
+            border-radius: 50%;
+        }
+
+        .eye-1 { top: 20%; right: 10%; }
+        .eye-2 { bottom: 30%; left: 5%; }
+
+        /* ============================================
+           PAGE NAVIGATION
+           ============================================ */
+        .page {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            z-index: 100;
+            background: rgba(0,0,0,0.8);
+            border: 2px solid var(--cream);
+            color: var(--cream);
+            padding: 0.75rem 1.5rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: var(--cream);
+            color: var(--blue-dark);
+        }
+
+        /* ============================================
+           VERTICAL AI - CROSSWORD PAGE
+           ============================================ */
+        .crossword-page {
+            background: var(--paper-bg);
+            color: var(--blue-dark);
+            padding: 4rem;
+        }
+
+        .crossword-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .crossword-header h1 {
+            font-family: 'Anton', sans-serif;
+            font-size: 4rem;
+            color: var(--red-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .crossword-header p {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.3rem;
+            color: var(--blue-primary);
+            margin-top: 1rem;
+        }
+
+        .crossword-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 4rem;
+            flex-wrap: wrap;
+        }
+
+        .crossword-grid {
+            display: grid;
+            gap: 2px;
+            background: var(--blue-dark);
+            padding: 2px;
+            box-shadow: 8px 8px 0 var(--red-primary);
+        }
+
+        .crossword-cell {
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Anton', sans-serif;
+            font-size: 1.4rem;
+            text-transform: uppercase;
+            position: relative;
+        }
+
+        .crossword-cell.filled {
+            background: var(--cream);
+            color: var(--blue-dark);
+        }
+
+        .crossword-cell.empty {
+            background: var(--blue-dark);
+        }
+
+        .crossword-cell.highlight-word {
+            background: var(--red-primary);
+            color: white;
+        }
+
+        .crossword-cell.future {
+            background: var(--blue-light);
+            color: white;
+        }
+
+        .crossword-cell.future::after {
+            content: '?';
+            font-size: 1.2rem;
+            opacity: 0.5;
+        }
+
+        .cell-number {
+            position: absolute;
+            top: 2px;
+            left: 3px;
+            font-size: 0.6rem;
+            font-family: 'Space Mono', monospace;
+            color: var(--blue-primary);
+        }
+
+        .crossword-clues {
+            max-width: 350px;
+        }
+
+        .clues-section {
+            margin-bottom: 2rem;
+        }
+
+        .clues-section h3 {
+            font-family: 'Anton', sans-serif;
+            font-size: 1.5rem;
+            color: var(--red-primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--red-primary);
+        }
+
+        .clue-item {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            padding-left: 1rem;
+            border-left: 2px solid var(--blue-light);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .clue-item:hover {
+            color: var(--red-primary);
+            border-left-color: var(--red-primary);
+        }
+
+        .clue-item strong {
+            color: var(--blue-primary);
+        }
+
+        .crossword-cta {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem;
+            background: var(--blue-dark);
+            color: var(--cream);
+        }
+
+        .crossword-cta h2 {
+            font-family: 'Anton', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .crossword-cta a {
+            display: inline-block;
+            background: var(--red-primary);
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            font-family: 'Space Mono', monospace;
+            font-weight: bold;
+            transition: transform 0.2s ease;
+        }
+
+        .crossword-cta a:hover {
+            transform: scale(1.05);
+        }
+
+        /* ============================================
+           HEALTHCARE - DIAGNOSTIC MACHINE
+           ============================================ */
+        .healthcare-page {
+            background: #0a0f14;
+            color: #00ffd0;
+            min-height: 100vh;
+            padding: 2rem;
+            font-family: 'JetBrains Mono', monospace;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Scanline effect */
+        .healthcare-page::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 255, 208, 0.03) 0px,
+                rgba(0, 255, 208, 0.03) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* Grid background */
+        .healthcare-page::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                linear-gradient(90deg, rgba(0, 255, 208, 0.03) 1px, transparent 1px),
+                linear-gradient(rgba(0, 255, 208, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+        .diagnostic-machine {
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Machine Header */
+        .machine-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background: linear-gradient(180deg, #1a2332 0%, #0d1219 100%);
+            border: 2px solid #00ffd0;
+            border-bottom: none;
+            position: relative;
+        }
+
+        .machine-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #00ffd0, transparent);
+            animation: headerPulse 2s infinite;
+        }
+
+        @keyframes headerPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .machine-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .machine-logo .cross-icon {
+            width: 50px;
+            height: 50px;
+            position: relative;
+        }
+
+        .machine-logo .cross-icon::before,
+        .machine-logo .cross-icon::after {
+            content: '';
+            position: absolute;
+            background: var(--red-primary);
+            box-shadow: 0 0 20px var(--red-primary);
+        }
+
+        .machine-logo .cross-icon::before {
+            width: 100%;
+            height: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .machine-logo .cross-icon::after {
+            width: 14px;
+            height: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .machine-logo h1 {
+            font-family: 'Anton', sans-serif;
+            font-size: 1.8rem;
+            color: #00ffd0;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            text-shadow: 0 0 30px rgba(0, 255, 208, 0.5);
+        }
+
+        .machine-logo span {
+            font-size: 0.8rem;
+            color: rgba(0, 255, 208, 0.5);
+            display: block;
+            letter-spacing: 0.3em;
+        }
+
+        .machine-status {
+            text-align: right;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: #00ffd0;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #00ffd0;
+            border-radius: 50%;
+            animation: statusPulse 1s infinite;
+            box-shadow: 0 0 10px #00ffd0;
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .machine-time {
+            font-size: 1.2rem;
+            color: var(--red-primary);
+            margin-top: 0.25rem;
+        }
+
+        /* Main Machine Body */
+        .machine-body {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 0;
+            border: 2px solid #00ffd0;
+            background: #0d1219;
+        }
+
+        /* Left Vitals Panel */
+        .vitals-panel {
+            background: linear-gradient(180deg, #0f1a24 0%, #0a1018 100%);
+            border-right: 2px solid rgba(0, 255, 208, 0.3);
+            padding: 1.5rem;
+        }
+
+        .vitals-header {
+            font-size: 0.7rem;
+            color: rgba(0, 255, 208, 0.5);
+            letter-spacing: 0.2em;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(0, 255, 208, 0.2);
+        }
+
+        .vital-monitor {
+            margin-bottom: 1.5rem;
+        }
+
+        .vital-label {
+            font-size: 0.65rem;
+            color: rgba(0, 255, 208, 0.6);
+            letter-spacing: 0.15em;
+            margin-bottom: 0.5rem;
+        }
+
+        .vital-value {
+            font-family: 'Anton', sans-serif;
+            font-size: 2.5rem;
+            color: #00ffd0;
+            text-shadow: 0 0 20px rgba(0, 255, 208, 0.5);
+            line-height: 1;
+        }
+
+        .vital-value.warning {
+            color: var(--terminal-amber);
+            text-shadow: 0 0 20px rgba(255, 176, 0, 0.5);
+        }
+
+        .vital-value.critical {
+            color: var(--red-primary);
+            text-shadow: 0 0 20px rgba(230, 57, 70, 0.5);
+            animation: criticalPulse 0.5s infinite;
+        }
+
+        @keyframes criticalPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .vital-unit {
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+
+        /* EKG Monitor */
+        .ekg-container {
+            margin: 2rem 0;
+            padding: 1rem 0;
+            border-top: 1px solid rgba(0, 255, 208, 0.2);
+            border-bottom: 1px solid rgba(0, 255, 208, 0.2);
+        }
+
+        .ekg-label {
+            font-size: 0.65rem;
+            color: var(--red-primary);
+            letter-spacing: 0.15em;
+            margin-bottom: 0.5rem;
+        }
+
+        .ekg-line {
+            height: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ekg-line svg {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            animation: ekgScroll 2s linear infinite;
+        }
+
+        @keyframes ekgScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .ekg-path {
+            fill: none;
+            stroke: var(--red-primary);
+            stroke-width: 2;
+            filter: drop-shadow(0 0 5px var(--red-primary));
+        }
+
+        /* Scan Progress */
+        .scan-progress {
+            margin-top: 2rem;
+        }
+
+        .scan-label {
+            font-size: 0.65rem;
+            color: rgba(0, 255, 208, 0.6);
+            letter-spacing: 0.15em;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .scan-bar {
+            height: 8px;
+            background: rgba(0, 255, 208, 0.1);
+            border: 1px solid rgba(0, 255, 208, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scan-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00ffd0, var(--healthcare-teal));
+            box-shadow: 0 0 15px #00ffd0;
+            transition: width 0.3s ease;
+        }
+
+        .scan-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: scanShine 2s infinite;
+        }
+
+        @keyframes scanShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Right Input Panel */
+        .input-panel {
+            padding: 2rem;
+            position: relative;
+        }
+
+        .input-panel::before {
+            content: 'PATIENT DATA INPUT';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 0.5rem 2rem;
+            background: rgba(0, 255, 208, 0.1);
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            color: rgba(0, 255, 208, 0.6);
+            border-bottom: 1px solid rgba(0, 255, 208, 0.2);
+        }
+
+        .diagnostic-form {
+            margin-top: 2rem;
+        }
+
+        .form-row {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row label {
+            display: block;
+            font-size: 0.7rem;
+            color: #00ffd0;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .form-row input,
+        .form-row select,
+        .form-row textarea {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(0, 255, 208, 0.05);
+            border: 1px solid rgba(0, 255, 208, 0.3);
+            color: #00ffd0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-row input:focus,
+        .form-row select:focus,
+        .form-row textarea:focus {
+            outline: none;
+            border-color: #00ffd0;
+            background: rgba(0, 255, 208, 0.1);
+            box-shadow: 0 0 20px rgba(0, 255, 208, 0.2), inset 0 0 20px rgba(0, 255, 208, 0.05);
+        }
+
+        .form-row input::placeholder,
+        .form-row textarea::placeholder {
+            color: rgba(0, 255, 208, 0.3);
+        }
+
+        .form-row select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300ffd0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+        }
+
+        .form-row select option {
+            background: #0d1219;
+            color: #00ffd0;
+        }
+
+        .form-row textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Vertical checkboxes */
+        .verticals-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .vertical-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(0, 255, 208, 0.03);
+            border: 1px solid rgba(0, 255, 208, 0.2);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .vertical-option:hover {
+            background: rgba(0, 255, 208, 0.08);
+            border-color: rgba(0, 255, 208, 0.4);
+        }
+
+        .vertical-option.selected {
+            background: rgba(0, 255, 208, 0.15);
+            border-color: #00ffd0;
+            box-shadow: 0 0 15px rgba(0, 255, 208, 0.2);
+        }
+
+        .vertical-option input {
+            display: none;
+        }
+
+        .vertical-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(0, 255, 208, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .vertical-option.selected .vertical-checkbox {
+            background: #00ffd0;
+            border-color: #00ffd0;
+        }
+
+        .vertical-option.selected .vertical-checkbox::after {
+            content: '✓';
+            color: #0a0f14;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .vertical-text {
+            font-size: 0.85rem;
+            color: rgba(0, 255, 208, 0.8);
+        }
+
+        /* Submit Button */
+        .initiate-scan {
+            width: 100%;
+            padding: 1.25rem 2rem;
+            margin-top: 2rem;
+            background: transparent;
+            border: 2px solid var(--red-primary);
+            color: var(--red-primary);
+            font-family: 'Anton', sans-serif;
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .initiate-scan::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(230, 57, 70, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .initiate-scan:hover {
+            background: var(--red-primary);
+            color: white;
+            box-shadow: 0 0 30px rgba(230, 57, 70, 0.5);
+        }
+
+        .initiate-scan:hover::before {
+            left: 100%;
+        }
+
+        /* Scanning State */
+        .scanning-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 15, 20, 0.95);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .scanning-overlay.active {
+            display: flex;
+        }
+
+        .scanning-animation {
+            width: 200px;
+            height: 200px;
+            position: relative;
+        }
+
+        .scan-ring {
+            position: absolute;
+            border: 3px solid #00ffd0;
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        .scan-ring:nth-child(1) {
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            animation: scanRing 2s infinite 0s;
+        }
+
+        .scan-ring:nth-child(2) {
+            width: 75%;
+            height: 75%;
+            top: 12.5%;
+            left: 12.5%;
+            animation: scanRing 2s infinite 0.3s;
+        }
+
+        .scan-ring:nth-child(3) {
+            width: 50%;
+            height: 50%;
+            top: 25%;
+            left: 25%;
+            animation: scanRing 2s infinite 0.6s;
+        }
+
+        @keyframes scanRing {
+            0% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; }
+            100% { opacity: 0; transform: scale(1.2); }
+        }
+
+        .scanning-text {
+            margin-top: 2rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            color: #00ffd0;
+            letter-spacing: 0.2em;
+        }
+
+        .scanning-text::after {
+            content: '';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+
+        /* Diagnosis Result */
+        .diagnosis-result {
+            display: none;
+            margin-top: 2rem;
+            border: 2px solid #00ffd0;
+            background: linear-gradient(180deg, rgba(0, 255, 208, 0.1) 0%, rgba(0, 255, 208, 0.02) 100%);
+        }
+
+        .diagnosis-result.active {
+            display: block;
+            animation: resultReveal 0.8s ease;
+        }
+
+        @keyframes resultReveal {
+            0% { opacity: 0; transform: translateY(20px); clip-path: inset(100% 0 0 0); }
+            100% { opacity: 1; transform: translateY(0); clip-path: inset(0 0 0 0); }
+        }
+
+        .result-header {
+            background: linear-gradient(90deg, var(--red-primary), #ff6b6b);
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .result-header h3 {
+            font-family: 'Anton', sans-serif;
+            font-size: 1.3rem;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .result-body {
+            padding: 1.5rem;
+        }
+
+        .result-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-metric {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 208, 0.2);
+        }
+
+        .result-metric-value {
+            font-family: 'Anton', sans-serif;
+            font-size: 2.5rem;
+            color: #00ffd0;
+            text-shadow: 0 0 20px rgba(0, 255, 208, 0.5);
+        }
+
+        .result-metric-label {
+            font-size: 0.7rem;
+            color: rgba(0, 255, 208, 0.6);
+            letter-spacing: 0.1em;
+            margin-top: 0.5rem;
+        }
+
+        .result-analysis {
+            padding: 1rem;
+            background: rgba(0, 255, 208, 0.05);
+            border-left: 3px solid #00ffd0;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: rgba(0, 255, 208, 0.9);
+        }
+
+        .result-recommendations {
+            border-top: 1px solid rgba(0, 255, 208, 0.2);
+            padding-top: 1.5rem;
+        }
+
+        .result-recommendations h4 {
+            font-size: 0.75rem;
+            color: var(--red-primary);
+            letter-spacing: 0.15em;
+            margin-bottom: 1rem;
+        }
+
+        .recommendation-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(0, 255, 208, 0.1);
+        }
+
+        .recommendation-item:last-child {
+            border-bottom: none;
+        }
+
+        .rec-number {
+            width: 24px;
+            height: 24px;
+            background: rgba(0, 255, 208, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: #00ffd0;
+            flex-shrink: 0;
+        }
+
+        .rec-text {
+            font-size: 0.9rem;
+            color: rgba(0, 255, 208, 0.8);
+        }
+
+        .apply-cta {
+            display: block;
+            width: 100%;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: linear-gradient(90deg, var(--red-primary), var(--red-dark));
+            border: none;
+            color: white;
+            font-family: 'Anton', sans-serif;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .apply-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(230, 57, 70, 0.4);
+        }
+
+        /* ============================================
+           INFRASTRUCTURE - TERMINAL PAGE
+           ============================================ */
+        .terminal-page {
+            background: #0a0a0a;
+            color: var(--terminal-green);
+            min-height: 100vh;
+            padding: 2rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .terminal-window {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #0d0d0d;
+            border: 1px solid #333;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+        }
+
+        .terminal-titlebar {
+            background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 100%);
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .terminal-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-btn.close { background: #ff5f57; }
+        .terminal-btn.minimize { background: #febc2e; }
+        .terminal-btn.maximize { background: #28c840; }
+
+        .terminal-title {
+            flex: 1;
+            text-align: center;
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .terminal-body {
+            padding: 1.5rem;
+            min-height: 500px;
+        }
+
+        .terminal-welcome {
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .terminal-welcome .ascii-art {
+            color: var(--terminal-amber);
+            font-size: 0.7rem;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        .terminal-line {
+            margin-bottom: 0.5rem;
+        }
+
+        .terminal-line .prompt {
+            color: var(--terminal-amber);
+        }
+
+        .terminal-line .command {
+            color: var(--terminal-green);
+        }
+
+        .terminal-line .output {
+            color: #888;
+            padding-left: 1rem;
+        }
+
+        .terminal-line .highlight {
+            color: var(--terminal-green);
+            font-weight: bold;
+        }
+
+        .terminal-line .error {
+            color: var(--red-primary);
+        }
+
+        .terminal-input-line {
+            display: flex;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .terminal-input-line .prompt {
+            color: var(--terminal-amber);
+            margin-right: 0.5rem;
+        }
+
+        .terminal-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--terminal-green);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            outline: none;
+            caret-color: var(--terminal-green);
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 18px;
+            background: var(--terminal-green);
+            animation: cursorBlink 1s infinite;
+            vertical-align: middle;
+            margin-left: 2px;
+        }
+
+        @keyframes cursorBlink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .terminal-output {
+            margin-top: 1rem;
+        }
+
+        .company-card {
+            background: rgba(0, 255, 65, 0.05);
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .company-card h4 {
+            color: var(--terminal-amber);
+            margin-bottom: 0.5rem;
+        }
+
+        .company-card p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .company-card .stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        .company-card .stat-item {
+            color: var(--terminal-green);
+        }
+
+        .help-commands {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .help-cmd {
+            color: var(--terminal-amber);
+        }
+
+        .help-desc {
+            color: #666;
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 1024px) {
+            .tiles-container {
+                grid-template-columns: 1fr;
+            }
+
+            .tile {
+                height: 300px;
+            }
+
+            .header {
+                padding: 1.5rem 2rem;
+            }
+
+            .hero-section {
+                padding: 0 2rem 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .crossword-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .crossword-cell {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+
+            .diagnosis-metrics {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- LANDING PAGE -->
+    <div id="landing" class="page active">
+        <div class="landing-page">
+            <!-- Surveillance decorative elements -->
+            <div class="surveillance-eye eye-1"></div>
+            <div class="surveillance-eye eye-2"></div>
+
+            <header class="header">
+                <div class="logo">
+                    <span class="logo-year">1984</span>
+                    <span class="logo-vc">.vc</span>
+                </div>
+                <div class="tagline">Investing in founders who rewrite the rules</div>
+            </header>
+
+            <section class="hero-section">
+                <h1 class="hero-text">
+                    We back <span class="highlight-red">rebels</span> building the
+                    <span class="highlight-blue">future</span> of industry
+                </h1>
+
+                <div class="tiles-container">
+                    <!-- Tile 1: Vertical AI -->
+                    <div class="tile tile-vertical-ai" onclick="showPage('vertical-ai')">
+                        <div class="tile-content">
+                            <div class="tile-number">01</div>
+                            <div>
+                                <h2 class="tile-title">Vertical AI</h2>
+                                <p class="tile-subtitle">Industry-specific intelligence that transforms sectors</p>
+                            </div>
+                            <div class="tile-arrow">→</div>
+                        </div>
+                    </div>
+
+                    <!-- Tile 2: Healthcare -->
+                    <div class="tile tile-healthcare" onclick="showPage('healthcare')">
+                        <div class="tile-content">
+                            <div class="tile-number">02</div>
+                            <div>
+                                <h2 class="tile-title">Healthcare AI</h2>
+                                <p class="tile-subtitle">Reimagining care delivery and outcomes</p>
+                            </div>
+                            <div class="tile-arrow">→</div>
+                        </div>
+                    </div>
+
+                    <!-- Tile 3: Infrastructure -->
+                    <div class="tile tile-infra" onclick="showPage('infra')">
+                        <div class="tile-content">
+                            <div class="tile-number">03</div>
+                            <div>
+                                <h2 class="tile-title">Infra & OSS</h2>
+                                <p class="tile-subtitle">The picks and shovels of the AI revolution</p>
+                            </div>
+                            <div class="tile-arrow">→</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- VERTICAL AI - CROSSWORD PAGE -->
+    <div id="vertical-ai" class="page">
+        <button class="back-button" onclick="showPage('landing')">← Back to Home</button>
+        <div class="crossword-page">
+            <div class="crossword-header">
+                <h1>Vertical AI</h1>
+                <p>Across industries, we're backing founders who apply AI to transform legacy sectors.<br>Solve the puzzle to see where we've invested—and spot the spaces still waiting for you.</p>
+            </div>
+
+            <div class="crossword-container">
+                <div class="crossword-grid" id="crossword">
+                    <!-- Grid will be generated by JavaScript -->
+                </div>
+
+                <div class="crossword-clues">
+                    <div class="clues-section">
+                        <h3>Across</h3>
+                        <div class="clue-item"><strong>1.</strong> Managing risk, pricing policies, automating claims (9)</div>
+                        <div class="clue-item"><strong>4.</strong> Recovering what's owed, intelligently (11)</div>
+                        <div class="clue-item"><strong>6.</strong> Buildings, leases, and property deals (12)</div>
+                        <div class="clue-item"><strong>8.</strong> Contracts, compliance, case research (5)</div>
+                    </div>
+                    <div class="clues-section">
+                        <h3>Down</h3>
+                        <div class="clue-item"><strong>2.</strong> Moving goods from A to B (9)</div>
+                        <div class="clue-item"><strong>3.</strong> Building and managing structures (12)</div>
+                        <div class="clue-item"><strong>5.</strong> Hiring, managing, paying people (2)</div>
+                        <div class="clue-item"><strong>7.</strong> Your sector here (?) — <em>Apply now</em></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="crossword-cta">
+                <h2>Think your industry belongs on this puzzle?</h2>
+                <a href="https://apply.1984.vc" target="_blank">Submit Your Pitch →</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEALTHCARE - DIAGNOSTIC MACHINE -->
+    <div id="healthcare" class="page">
+        <button class="back-button" onclick="showPage('landing')" style="border-color: #00ffd0; color: #00ffd0;">← Back to Home</button>
+
+        <!-- Scanning Overlay -->
+        <div class="scanning-overlay" id="scanningOverlay">
+            <div class="scanning-animation">
+                <div class="scan-ring"></div>
+                <div class="scan-ring"></div>
+                <div class="scan-ring"></div>
+            </div>
+            <div class="scanning-text">ANALYZING FOUNDER DNA</div>
+        </div>
+
+        <div class="healthcare-page">
+            <div class="diagnostic-machine">
+                <!-- Machine Header -->
+                <div class="machine-header">
+                    <div class="machine-logo">
+                        <div class="cross-icon"></div>
+                        <div>
+                            <h1>1984 Diagnostic</h1>
+                            <span>Founder Health Assessment System</span>
+                        </div>
+                    </div>
+                    <div class="machine-status">
+                        <div class="status-indicator">
+                            <div class="status-dot"></div>
+                            <span>SYSTEM ONLINE</span>
+                        </div>
+                        <div class="machine-time" id="machineTime">--:--:--</div>
+                    </div>
+                </div>
+
+                <!-- Machine Body -->
+                <div class="machine-body">
+                    <!-- Left Vitals Panel -->
+                    <div class="vitals-panel">
+                        <div class="vitals-header">REAL-TIME VITALS</div>
+
+                        <div class="vital-monitor">
+                            <div class="vital-label">MARKET FIT INDEX</div>
+                            <div class="vital-value" id="vitalMFI">--<span class="vital-unit">%</span></div>
+                        </div>
+
+                        <div class="vital-monitor">
+                            <div class="vital-label">FOUNDER SIGNAL</div>
+                            <div class="vital-value" id="vitalFS">--<span class="vital-unit">dB</span></div>
+                        </div>
+
+                        <div class="vital-monitor">
+                            <div class="vital-label">TRACTION VELOCITY</div>
+                            <div class="vital-value" id="vitalTV">--<span class="vital-unit">x</span></div>
+                        </div>
+
+                        <!-- EKG Monitor -->
+                        <div class="ekg-container">
+                            <div class="ekg-label">STARTUP HEARTBEAT</div>
+                            <div class="ekg-line">
+                                <svg viewBox="0 0 600 60" preserveAspectRatio="none">
+                                    <path class="ekg-path" d="M0,30 L50,30 L60,30 L70,10 L80,50 L90,20 L100,40 L110,30 L150,30 L160,30 L170,10 L180,50 L190,20 L200,40 L210,30 L250,30 L260,30 L270,10 L280,50 L290,20 L300,40 L310,30 L350,30 L360,30 L370,10 L380,50 L390,20 L400,40 L410,30 L450,30 L460,30 L470,10 L480,50 L490,20 L500,40 L510,30 L550,30 L560,30 L570,10 L580,50 L590,20 L600,40"></path>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Scan Progress -->
+                        <div class="scan-progress">
+                            <div class="scan-label">
+                                <span>SCAN PROGRESS</span>
+                                <span id="scanPercent">0%</span>
+                            </div>
+                            <div class="scan-bar">
+                                <div class="scan-fill" id="scanFill"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Input Panel -->
+                    <div class="input-panel">
+                        <form class="diagnostic-form" id="diagnosticForm">
+                            <div class="form-row">
+                                <label>Company Identifier</label>
+                                <input type="text" id="companyName" placeholder="Enter company name..." required>
+                            </div>
+
+                            <div class="form-row">
+                                <label>Chief Complaint (Primary Problem)</label>
+                                <textarea id="problem" placeholder="Describe the critical pain point you're solving in healthcare..." required></textarea>
+                            </div>
+
+                            <div class="form-row">
+                                <label>Development Stage</label>
+                                <select id="stage" required>
+                                    <option value="">Select stage...</option>
+                                    <option value="idea">Pre-Seed (Idea Stage)</option>
+                                    <option value="mvp">Seed (MVP/Early Users)</option>
+                                    <option value="growth">Series A (Growth Mode)</option>
+                                    <option value="scale">Series B+ (Scaling)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-row">
+                                <label>Healthcare Vertical</label>
+                                <div class="verticals-grid" id="verticalsGrid">
+                                    <label class="vertical-option" data-value="clinical">
+                                        <input type="checkbox" name="vertical" value="clinical">
+                                        <span class="vertical-checkbox"></span>
+                                        <span class="vertical-text">Clinical Workflow</span>
+                                    </label>
+                                    <label class="vertical-option" data-value="diagnostics">
+                                        <input type="checkbox" name="vertical" value="diagnostics">
+                                        <span class="vertical-checkbox"></span>
+                                        <span class="vertical-text">Diagnostics & Imaging</span>
+                                    </label>
+                                    <label class="vertical-option" data-value="pharma">
+                                        <input type="checkbox" name="vertical" value="pharma">
+                                        <span class="vertical-checkbox"></span>
+                                        <span class="vertical-text">Pharma & Drug Discovery</span>
+                                    </label>
+                                    <label class="vertical-option" data-value="payer">
+                                        <input type="checkbox" name="vertical" value="payer">
+                                        <span class="vertical-checkbox"></span>
+                                        <span class="vertical-text">Payer & Insurance</span>
+                                    </label>
+                                    <label class="vertical-option" data-value="consumer">
+                                        <input type="checkbox" name="vertical" value="consumer">
+                                        <span class="vertical-checkbox"></span>
+                                        <span class="vertical-text">Consumer Health</span>
+                                    </label>
+                                    <label class="vertical-option" data-value="infrastructure">
+                                        <input type="checkbox" name="vertical" value="infrastructure">
+                                        <span class="vertical-checkbox"></span>
+                                        <span class="vertical-text">Health Data Infra</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div>
+                                    <label>MRR</label>
+                                    <input type="text" id="mrr" placeholder="$0 - $XXX,XXX">
+                                </div>
+                                <div>
+                                    <label>Team Size</label>
+                                    <input type="number" id="teamSize" placeholder="# of people">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="initiate-scan">▶ Initiate Diagnostic Scan</button>
+                        </form>
+
+                        <!-- Diagnosis Result -->
+                        <div class="diagnosis-result" id="diagnosisResult">
+                            <div class="result-header">
+                                <h3>⚡ Diagnostic Complete: <span id="resultCompany"></span></h3>
+                            </div>
+                            <div class="result-body">
+                                <div class="result-metrics">
+                                    <div class="result-metric">
+                                        <div class="result-metric-value" id="metricFit">--</div>
+                                        <div class="result-metric-label">1984 Fit Score</div>
+                                    </div>
+                                    <div class="result-metric">
+                                        <div class="result-metric-value" id="metricMarket">--</div>
+                                        <div class="result-metric-label">Market Potential</div>
+                                    </div>
+                                    <div class="result-metric">
+                                        <div class="result-metric-value" id="metricReady">--</div>
+                                        <div class="result-metric-label">Investment Ready</div>
+                                    </div>
+                                </div>
+
+                                <div class="result-analysis" id="resultAnalysis">
+                                    Analysis loading...
+                                </div>
+
+                                <div class="result-recommendations">
+                                    <h4>▸ RECOMMENDED PROTOCOL</h4>
+                                    <div id="recommendationsList"></div>
+                                </div>
+
+                                <a href="https://apply.1984.vc" target="_blank" class="apply-cta">
+                                    → Proceed to Full Application
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INFRASTRUCTURE - TERMINAL PAGE -->
+    <div id="infra" class="page">
+        <button class="back-button" onclick="showPage('landing')" style="border-color: var(--terminal-green); color: var(--terminal-green);">← Back to Home</button>
+        <div class="terminal-page">
+            <div class="terminal-window">
+                <div class="terminal-titlebar">
+                    <div class="terminal-btn close"></div>
+                    <div class="terminal-btn minimize"></div>
+                    <div class="terminal-btn maximize"></div>
+                    <div class="terminal-title">1984@infrastructure ~ % portfolio</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-welcome">
+                        <pre class="ascii-art">
+  __   ___   ___  _  _     _____  _____
+ /_ | / _ \ / _ \| || |   |  __ \/ ____|
+  | || (_) | (_) | || |_  | |  | | (___
+  | | > _ < > _ <|__   _| | |  | |\___ \
+  | || (_) | (_) |  | | _ | |__| |____) |
+  |_| \___/ \___/   |_|(_)|_____/|_____/
+
+  INFRASTRUCTURE & OPEN SOURCE PORTFOLIO
+                        </pre>
+                        <div class="terminal-line">
+                            <span class="output">Welcome to 1984.vc Infrastructure Terminal v2.0.24</span>
+                        </div>
+                        <div class="terminal-line">
+                            <span class="output">We back the builders of developer infrastructure and open-source foundations.</span>
+                        </div>
+                        <div class="terminal-line">
+                            <span class="output">Type <span class="highlight">help</span> to see available commands.</span>
+                        </div>
+                    </div>
+
+                    <div id="terminalOutput" class="terminal-output"></div>
+
+                    <div class="terminal-input-line">
+                        <span class="prompt">1984@infra:~$</span>
+                        <input type="text" class="terminal-input" id="terminalInput" placeholder="Type a command..." autofocus>
+                        <span class="cursor"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Page Navigation
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+
+            if (pageId === 'infra') {
+                document.getElementById('terminalInput').focus();
+            }
+        }
+
+        // ============================================
+        // CROSSWORD PUZZLE LOGIC
+        // ============================================
+        const crosswordData = {
+            grid: [
+                ['I','N','S','U','R','A','N','C','E','_','_','_','_'],
+                ['_','_','_','_','_','_','_','O','_','_','_','_','_'],
+                ['_','L','_','_','_','_','_','N','_','_','_','_','_'],
+                ['D','E','B','T','C','O','L','S','T','R','U','C','T'],
+                ['_','G','_','_','_','_','_','I','_','_','_','_','_'],
+                ['_','A','_','_','_','H','R','O','N','_','_','_','_'],
+                ['R','L','E','A','L','E','S','T','A','T','E','_','_'],
+                ['_','_','_','_','_','_','_','_','_','_','_','_','_'],
+                ['L','E','G','A','L','_','?','_','?','_','?','_','_'],
+            ],
+            highlights: {
+                'INSURANCE': [[0,0], [0,1], [0,2], [0,3], [0,4], [0,5], [0,6], [0,7], [0,8]],
+                'DEBTCOLLECT': [[3,0], [3,1], [3,2], [3,3], [3,4], [3,5], [3,6], [3,7], [3,8], [3,9], [3,10]],
+                'REALESTATE': [[6,0], [6,1], [6,2], [6,3], [6,4], [6,5], [6,6], [6,7], [6,8], [6,9], [6,10]],
+                'LEGAL': [[8,0], [8,1], [8,2], [8,3], [8,4]],
+                'LOGISTICS': [[0,7], [1,7], [2,7], [3,7], [4,7], [5,7], [6,7]],
+                'CONSTRUCTION': [[3,7], [3,8], [3,9], [3,10], [3,11], [3,12]],
+            },
+            future: [[8,6], [8,8], [8,10]]
+        };
+
+        function generateCrossword() {
+            const gridEl = document.getElementById('crossword');
+            const grid = crosswordData.grid;
+            const rows = grid.length;
+            const cols = grid[0].length;
+
+            gridEl.style.gridTemplateColumns = `repeat(${cols}, 45px)`;
+
+            let cellNumber = 1;
+
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'crossword-cell';
+
+                    const char = grid[r][c];
+
+                    if (char === '_') {
+                        cell.classList.add('empty');
+                    } else if (char === '?') {
+                        cell.classList.add('future');
+                    } else {
+                        cell.classList.add('filled');
+                        cell.textContent = char;
+
+                        // Add numbers for start of words
+                        const isWordStart = (c === 0 || grid[r][c-1] === '_') || (r === 0 || grid[r-1][c] === '_');
+                        if (isWordStart && char !== '_') {
+                            const numSpan = document.createElement('span');
+                            numSpan.className = 'cell-number';
+                            numSpan.textContent = cellNumber++;
+                            cell.appendChild(numSpan);
+                        }
+                    }
+
+                    gridEl.appendChild(cell);
+                }
+            }
+        }
+
+        // ============================================
+        // HEALTHCARE DIAGNOSTIC MACHINE LOGIC
+        // ============================================
+
+        // Update machine time
+        function updateMachineTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+            const timeEl = document.getElementById('machineTime');
+            if (timeEl) timeEl.textContent = timeStr;
+        }
+        setInterval(updateMachineTime, 1000);
+        updateMachineTime();
+
+        // Animate vitals on page load
+        function animateVitals() {
+            const mfi = document.getElementById('vitalMFI');
+            const fs = document.getElementById('vitalFS');
+            const tv = document.getElementById('vitalTV');
+
+            if (mfi && fs && tv) {
+                setInterval(() => {
+                    mfi.innerHTML = (75 + Math.floor(Math.random() * 15)) + '<span class="vital-unit">%</span>';
+                    fs.innerHTML = (42 + Math.floor(Math.random() * 8)) + '<span class="vital-unit">dB</span>';
+                    tv.innerHTML = (1.2 + Math.random() * 0.8).toFixed(1) + '<span class="vital-unit">x</span>';
+                }, 2000);
+            }
+        }
+
+        // Handle vertical option selection
+        document.querySelectorAll('.vertical-option').forEach(option => {
+            option.addEventListener('click', function() {
+                this.classList.toggle('selected');
+                const checkbox = this.querySelector('input[type="checkbox"]');
+                checkbox.checked = !checkbox.checked;
+            });
+        });
+
+        // Diagnostic form submission
+        document.getElementById('diagnosticForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const companyName = document.getElementById('companyName').value;
+            const stage = document.getElementById('stage').value;
+            const verticals = Array.from(document.querySelectorAll('.vertical-option.selected')).map(el => el.dataset.value);
+
+            // Show scanning overlay
+            const overlay = document.getElementById('scanningOverlay');
+            overlay.classList.add('active');
+
+            // Animate scan progress
+            let progress = 0;
+            const scanFill = document.getElementById('scanFill');
+            const scanPercent = document.getElementById('scanPercent');
+
+            const scanInterval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 100) progress = 100;
+                scanFill.style.width = progress + '%';
+                scanPercent.textContent = Math.floor(progress) + '%';
+
+                if (progress >= 100) {
+                    clearInterval(scanInterval);
+
+                    // Hide overlay after brief delay
+                    setTimeout(() => {
+                        overlay.classList.remove('active');
+                        showDiagnosisResult(companyName, stage, verticals);
+                    }, 500);
+                }
+            }, 150);
+        });
+
+        function showDiagnosisResult(companyName, stage, verticals) {
+            // Generate scores
+            const fitScore = Math.floor(Math.random() * 20) + 78; // 78-97
+            const marketScores = ['A+', 'A', 'A-', 'B+'];
+            const readyScores = ['HIGH', 'STRONG', 'READY'];
+
+            document.getElementById('resultCompany').textContent = companyName;
+            document.getElementById('metricFit').textContent = fitScore + '%';
+            document.getElementById('metricMarket').textContent = marketScores[Math.floor(Math.random() * marketScores.length)];
+            document.getElementById('metricReady').textContent = readyScores[Math.floor(Math.random() * readyScores.length)];
+
+            const verticalNames = {
+                clinical: 'clinical workflow optimization',
+                diagnostics: 'AI-powered diagnostics',
+                pharma: 'pharmaceutical innovation',
+                payer: 'payer technology',
+                consumer: 'consumer health',
+                infrastructure: 'health data infrastructure'
+            };
+
+            const selectedVerticalText = verticals.map(v => verticalNames[v]).join(' and ') || 'healthcare technology';
+
+            document.getElementById('resultAnalysis').textContent =
+                `ANALYSIS: ${companyName.toUpperCase()} demonstrates strong founder-market fit indicators in ${selectedVerticalText}. ` +
+                `Pattern recognition suggests alignment with our thesis of backing founders who understand regulatory complexity while delivering 10x improvements. ` +
+                `Recommend proceeding to full diagnostic protocol.`;
+
+            const recommendations = [
+                'Schedule 30-minute diagnostic call with Healthcare GP',
+                'Upload pitch deck for deep pattern analysis',
+                'Cross-reference with relevant portfolio founders',
+                'Prepare clinical validation documentation',
+                'Complete regulatory pathway assessment'
+            ];
+
+            const recList = document.getElementById('recommendationsList');
+            recList.innerHTML = '';
+            recommendations.forEach((rec, i) => {
+                const item = document.createElement('div');
+                item.className = 'recommendation-item';
+                item.innerHTML = `<span class="rec-number">${String(i + 1).padStart(2, '0')}</span><span class="rec-text">${rec}</span>`;
+                recList.appendChild(item);
+            });
+
+            document.getElementById('diagnosisResult').classList.add('active');
+            document.getElementById('diagnosisResult').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Initialize vitals animation when healthcare page is shown
+        const healthcareObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.target.classList.contains('active') && mutation.target.id === 'healthcare') {
+                    animateVitals();
+                }
+            });
+        });
+
+        const healthcarePage = document.getElementById('healthcare');
+        if (healthcarePage) {
+            healthcareObserver.observe(healthcarePage, { attributes: true, attributeFilter: ['class'] });
+        }
+
+        // ============================================
+        // TERMINAL LOGIC
+        // ============================================
+        const portfolioCompanies = {
+            'materialize': {
+                name: 'Materialize',
+                description: 'Streaming SQL database for real-time analytics',
+                stars: '5.2k',
+                category: 'Databases',
+                status: 'Active'
+            },
+            'pulumi': {
+                name: 'Pulumi',
+                description: 'Infrastructure as code in any programming language',
+                stars: '19k',
+                category: 'Infrastructure',
+                status: 'Active'
+            },
+            'temporal': {
+                name: 'Temporal',
+                description: 'Durable execution platform for mission-critical code',
+                stars: '9.5k',
+                category: 'Workflow',
+                status: 'Active'
+            },
+            'prefect': {
+                name: 'Prefect',
+                description: 'Modern data workflow orchestration',
+                stars: '14k',
+                category: 'Data Engineering',
+                status: 'Active'
+            },
+            'dagster': {
+                name: 'Dagster',
+                description: 'Data orchestration platform for ML, analytics, and ETL',
+                stars: '10k',
+                category: 'Data Engineering',
+                status: 'Active'
+            }
+        };
+
+        const terminalCommands = {
+            help: () => {
+                return `
+<div class="help-commands">
+    <span class="help-cmd">list</span><span class="help-desc">List all portfolio companies</span>
+    <span class="help-cmd">show [company]</span><span class="help-desc">Show details for a company</span>
+    <span class="help-cmd">search [keyword]</span><span class="help-desc">Search portfolio</span>
+    <span class="help-cmd">thesis</span><span class="help-desc">Our infrastructure investment thesis</span>
+    <span class="help-cmd">apply</span><span class="help-desc">How to pitch us</span>
+    <span class="help-cmd">clear</span><span class="help-desc">Clear terminal</span>
+</div>`;
+            },
+            list: () => {
+                let output = '<div style="margin: 1rem 0;">';
+                output += '<div style="color: var(--terminal-amber); margin-bottom: 0.5rem;">PORTFOLIO COMPANIES:</div>';
+                Object.entries(portfolioCompanies).forEach(([key, company]) => {
+                    output += `<div class="terminal-line"><span class="highlight">${company.name}</span> - ${company.description}</div>`;
+                });
+                output += '</div>';
+                return output;
+            },
+            show: (args) => {
+                const companyKey = args.toLowerCase();
+                const company = portfolioCompanies[companyKey];
+                if (company) {
+                    return `
+<div class="company-card">
+    <h4>${company.name}</h4>
+    <p>${company.description}</p>
+    <div class="stats">
+        <span class="stat-item">★ ${company.stars} GitHub Stars</span>
+        <span class="stat-item">📁 ${company.category}</span>
+        <span class="stat-item">● ${company.status}</span>
+    </div>
+</div>`;
+                }
+                return `<span class="error">Company not found. Try 'list' to see all companies.</span>`;
+            },
+            search: (args) => {
+                const results = Object.values(portfolioCompanies).filter(c =>
+                    c.description.toLowerCase().includes(args.toLowerCase()) ||
+                    c.category.toLowerCase().includes(args.toLowerCase())
+                );
+                if (results.length > 0) {
+                    let output = `<div style="color: var(--terminal-amber);">Found ${results.length} result(s):</div>`;
+                    results.forEach(c => {
+                        output += `<div class="terminal-line"><span class="highlight">${c.name}</span> - ${c.description}</div>`;
+                    });
+                    return output;
+                }
+                return `<span class="error">No results found for "${args}"</span>`;
+            },
+            thesis: () => {
+                return `
+<div style="margin: 1rem 0; line-height: 1.8;">
+    <div style="color: var(--terminal-amber); margin-bottom: 1rem;">INFRASTRUCTURE INVESTMENT THESIS:</div>
+    <div class="terminal-line">→ We back <span class="highlight">developer-first</span> infrastructure companies</div>
+    <div class="terminal-line">→ Open source with strong <span class="highlight">community adoption</span></div>
+    <div class="terminal-line">→ Solving <span class="highlight">10x problems</span> for engineering teams</div>
+    <div class="terminal-line">→ Building the <span class="highlight">primitives</span> of modern software</div>
+    <div class="terminal-line">→ Focus on <span class="highlight">databases, orchestration, observability, and dev tools</span></div>
+</div>`;
+            },
+            apply: () => {
+                return `
+<div style="margin: 1rem 0;">
+    <div style="color: var(--terminal-amber);">READY TO PITCH?</div>
+    <div class="terminal-line" style="margin-top: 0.5rem;">
+        Visit <span class="highlight">apply.1984.vc</span> or email <span class="highlight">founders@1984.vc</span>
+    </div>
+    <div class="terminal-line">We respond to every founder within 48 hours.</div>
+</div>`;
+            },
+            clear: () => {
+                document.getElementById('terminalOutput').innerHTML = '';
+                return '';
+            }
+        };
+
+        const terminalInput = document.getElementById('terminalInput');
+        const terminalOutput = document.getElementById('terminalOutput');
+
+        terminalInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const input = this.value.trim();
+                if (!input) return;
+
+                // Add command to output
+                terminalOutput.innerHTML += `<div class="terminal-line"><span class="prompt">1984@infra:~$</span> <span class="command">${input}</span></div>`;
+
+                // Parse command
+                const [cmd, ...args] = input.split(' ');
+                const argString = args.join(' ');
+
+                let output;
+                if (terminalCommands[cmd]) {
+                    output = terminalCommands[cmd](argString);
+                } else {
+                    output = `<span class="error">Command not found: ${cmd}. Type 'help' for available commands.</span>`;
+                }
+
+                if (output) {
+                    terminalOutput.innerHTML += `<div class="terminal-line">${output}</div>`;
+                }
+
+                this.value = '';
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            }
+        });
+
+        // Initialize crossword on load
+        document.addEventListener('DOMContentLoaded', generateCrossword);
+    </script>
+</body>
+</html>

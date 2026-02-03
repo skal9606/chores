@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YouTube Transcript Summarizer</title>
     <link rel="stylesheet" href="/static/style.css">
+    <!-- DOMPurify for XSS protection -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.8/purify.min.js" integrity="sha512-5NdTLVm7Wg/HCfLwGURH7lPLVyXrKykqZyzSZ0Ohl64rPJRuOJjOR+p0R3gwsvsfyHJ5fqn6cjtwIIC6VpqWYQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
     <div class="container">
@@ -21,7 +23,7 @@
                     placeholder="https://www.youtube.com/watch?v=..."
                     autocomplete="off"
                 >
-                <button id="summarize-btn" onclick="summarize()">
+                <button id="summarize-btn">
                     <span class="btn-text">Summarize</span>
                     <span class="btn-loading" style="display: none;">
                         <span class="spinner"></span>
@@ -36,10 +38,10 @@
                 <div class="result-header">
                     <h2>Summary</h2>
                     <div class="result-actions">
-                        <button id="download-btn" class="download-btn" onclick="downloadTranscript()">
+                        <button id="download-btn" class="download-btn">
                             Download Transcript (.md)
                         </button>
-                        <a id="video-link" href="#" target="_blank" class="video-link">
+                        <a id="video-link" href="#" target="_blank" rel="noopener noreferrer" class="video-link">
                             Watch on YouTube ↗
                         </a>
                     </div>
@@ -59,8 +61,10 @@
     </div>
 
     <script>
+        // DOM elements
         const urlInput = document.getElementById('youtube-url');
         const summarizeBtn = document.getElementById('summarize-btn');
+        const downloadBtn = document.getElementById('download-btn');
         const btnText = summarizeBtn.querySelector('.btn-text');
         const btnLoading = summarizeBtn.querySelector('.btn-loading');
         const errorMessage = document.getElementById('error-message');
@@ -72,12 +76,21 @@
         // Store current video data for download
         let currentVideoData = null;
 
-        // Allow Enter key to submit
+        // Event listeners (no inline handlers for CSP compliance)
+        summarizeBtn.addEventListener('click', summarize);
+        downloadBtn.addEventListener('click', downloadTranscript);
         urlInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 summarize();
             }
         });
+
+        // Escape HTML entities to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
 
         async function summarize() {
             const url = urlInput.value.trim();
@@ -108,6 +121,12 @@
                     return;
                 }
 
+                // Validate video_id format (11 chars, alphanumeric + dash + underscore)
+                if (!/^[a-zA-Z0-9_-]{11}$/.test(data.video_id)) {
+                    showError('Invalid video ID received');
+                    return;
+                }
+
                 // Store data for download
                 currentVideoData = {
                     video_id: data.video_id,
@@ -116,9 +135,18 @@
                     url: url
                 };
 
-                // Display results
-                videoLink.href = `https://www.youtube.com/watch?v=${data.video_id}`;
-                summaryContent.innerHTML = formatMarkdown(data.summary);
+                // Display results - sanitize before rendering
+                videoLink.href = `https://www.youtube.com/watch?v=${encodeURIComponent(data.video_id)}`;
+
+                // Convert markdown to HTML, then sanitize with DOMPurify
+                const rawHtml = formatMarkdown(data.summary);
+                const sanitizedHtml = DOMPurify.sanitize(rawHtml, {
+                    ALLOWED_TAGS: ['h2', 'h3', 'h4', 'p', 'ul', 'ol', 'li', 'strong', 'em', 'br'],
+                    ALLOWED_ATTR: []  // No attributes allowed - prevents event handlers
+                });
+                summaryContent.innerHTML = sanitizedHtml;
+
+                // Transcript uses textContent (already safe)
                 transcriptContent.textContent = data.transcript;
                 result.style.display = 'block';
 
@@ -133,9 +161,12 @@
         function downloadTranscript() {
             if (!currentVideoData) return;
 
+            // Escape for markdown context
+            const safeVideoId = currentVideoData.video_id.replace(/[^a-zA-Z0-9_-]/g, '');
+
             const markdown = `# YouTube Video Transcript
 
-**Video URL:** https://www.youtube.com/watch?v=${currentVideoData.video_id}
+**Video URL:** https://www.youtube.com/watch?v=${safeVideoId}
 
 ---
 
@@ -154,7 +185,7 @@ ${currentVideoData.transcript}
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `youtube-transcript-${currentVideoData.video_id}.md`;
+            a.download = `youtube-transcript-${safeVideoId}.md`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -169,6 +200,7 @@ ${currentVideoData.transcript}
         }
 
         function showError(message) {
+            // Use textContent to prevent XSS in error messages
             errorMessage.textContent = message;
             errorMessage.style.display = 'block';
         }
@@ -178,6 +210,9 @@ ${currentVideoData.transcript}
         }
 
         function formatMarkdown(text) {
+            // First, escape any HTML in the input to prevent XSS
+            text = escapeHtml(text);
+
             // Process line by line for better control
             const lines = text.split('\n');
             let html = '';
@@ -187,7 +222,7 @@ ${currentVideoData.transcript}
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i];
 
-                // Bold
+                // Bold (using escaped ** markers)
                 line = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
                 // Italic (but not bullet points)
                 line = line.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');

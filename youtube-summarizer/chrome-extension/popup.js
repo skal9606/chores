@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (tab.url && tab.url.includes('youtube.com/watch')) {
         const videoId = extractVideoId(tab.url);
-        if (videoId) {
+        if (videoId && validateVideoId(videoId)) {
             currentVideoId = videoId;
             currentVideoIdSpan.textContent = videoId;
             videoDetectedDiv.style.display = 'block';
@@ -56,6 +56,11 @@ function showNotYoutube() {
     videoDetectedDiv.style.display = 'none';
 }
 
+// Validate video ID format (11 alphanumeric + dash + underscore)
+function validateVideoId(videoId) {
+    return /^[a-zA-Z0-9_-]{11}$/.test(videoId);
+}
+
 function extractVideoId(url) {
     const patterns = [
         /[?&]v=([a-zA-Z0-9_-]{11})/,
@@ -65,7 +70,7 @@ function extractVideoId(url) {
 
     for (const pattern of patterns) {
         const match = url.match(pattern);
-        if (match) return match[1];
+        if (match && validateVideoId(match[1])) return match[1];
     }
     return null;
 }
@@ -74,8 +79,35 @@ function getBackendUrl() {
     return backendUrlInput.value.trim() || DEFAULT_BACKEND_URL;
 }
 
+// Escape HTML entities to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Simple HTML sanitizer - only allows safe tags
+function sanitizeHtml(html) {
+    const allowedTags = ['h2', 'h3', 'h4', 'p', 'ul', 'ol', 'li', 'strong', 'em', 'br'];
+    const tagPattern = /<\/?([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/gi;
+
+    return html.replace(tagPattern, (match, tagName) => {
+        const lowerTag = tagName.toLowerCase();
+        if (allowedTags.includes(lowerTag)) {
+            // Only allow the tag itself, strip all attributes
+            if (match.startsWith('</')) {
+                return `</${lowerTag}>`;
+            } else {
+                return `<${lowerTag}>`;
+            }
+        }
+        // Remove disallowed tags entirely
+        return '';
+    });
+}
+
 async function summarize() {
-    if (!currentVideoId) return;
+    if (!currentVideoId || !validateVideoId(currentVideoId)) return;
 
     setLoading(true);
     hideError();
@@ -98,6 +130,12 @@ async function summarize() {
             return;
         }
 
+        // Validate returned video ID
+        if (!validateVideoId(data.video_id)) {
+            showError('Invalid response from server');
+            return;
+        }
+
         // Store data for download
         currentVideoData = {
             video_id: data.video_id,
@@ -105,8 +143,10 @@ async function summarize() {
             summary: data.summary
         };
 
-        // Display summary
-        summaryContent.innerHTML = formatMarkdown(data.summary);
+        // Display summary with XSS protection
+        const rawHtml = formatMarkdown(data.summary);
+        const sanitizedHtml = sanitizeHtml(rawHtml);
+        summaryContent.innerHTML = sanitizedHtml;
         resultDiv.style.display = 'block';
         downloadBtn.disabled = false;
 
@@ -121,9 +161,12 @@ async function summarize() {
 function downloadTranscript() {
     if (!currentVideoData) return;
 
+    // Sanitize video ID for filename
+    const safeVideoId = currentVideoData.video_id.replace(/[^a-zA-Z0-9_-]/g, '');
+
     const markdown = `# YouTube Video Transcript
 
-**Video URL:** https://www.youtube.com/watch?v=${currentVideoData.video_id}
+**Video URL:** https://www.youtube.com/watch?v=${safeVideoId}
 
 ---
 
@@ -143,7 +186,7 @@ ${currentVideoData.transcript}
 
     chrome.downloads.download({
         url: url,
-        filename: `youtube-transcript-${currentVideoData.video_id}.md`,
+        filename: `youtube-transcript-${safeVideoId}.md`,
         saveAs: true
     });
 }
@@ -164,6 +207,7 @@ function setLoading(loading) {
 }
 
 function showError(message) {
+    // Use textContent to prevent XSS
     errorMessage.textContent = message;
     errorMessage.style.display = 'block';
 }
@@ -173,6 +217,9 @@ function hideError() {
 }
 
 function formatMarkdown(text) {
+    // First, escape any HTML in the input to prevent XSS
+    text = escapeHtml(text);
+
     const lines = text.split('\n');
     let html = '';
     let inList = false;

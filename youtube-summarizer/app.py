@@ -114,5 +114,11 @@ def get_transcript():
     })
 
 
+@app.route("/privacy")
+def privacy():
+    """Serve the privacy policy page."""
+    return render_template("privacy.html")
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=5001)

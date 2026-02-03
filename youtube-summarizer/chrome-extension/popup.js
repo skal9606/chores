@@ -1,5 +1,5 @@
-// Default backend URL - update this after deploying to Render
-const DEFAULT_BACKEND_URL = 'http://localhost:5001';
+// Default backend URL - your deployed Render instance
+const DEFAULT_BACKEND_URL = 'https://youtube-summarizer-vuui.onrender.com';
 
 let currentVideoId = null;
 let currentVideoData = null;

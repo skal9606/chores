@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Transcript Summarizer</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>YouTube Transcript Summarizer</h1>
+            <p class="subtitle">Paste a YouTube URL to get key learnings from the video</p>
+        </header>
+
+        <main>
+            <div class="input-section">
+                <input
+                    type="text"
+                    id="youtube-url"
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    autocomplete="off"
+                >
+                <button id="summarize-btn" onclick="summarize()">
+                    <span class="btn-text">Summarize</span>
+                    <span class="btn-loading" style="display: none;">
+                        <span class="spinner"></span>
+                        Processing...
+                    </span>
+                </button>
+            </div>
+
+            <div id="error-message" class="error-message" style="display: none;"></div>
+
+            <div id="result" class="result" style="display: none;">
+                <div class="result-header">
+                    <h2>Summary</h2>
+                    <div class="result-actions">
+                        <button id="download-btn" class="download-btn" onclick="downloadTranscript()">
+                            Download Transcript (.md)
+                        </button>
+                        <a id="video-link" href="#" target="_blank" class="video-link">
+                            Watch on YouTube ↗
+                        </a>
+                    </div>
+                </div>
+                <div id="summary-content" class="summary-content"></div>
+
+                <details class="transcript-details">
+                    <summary>View Full Transcript</summary>
+                    <div id="transcript-content" class="transcript-content"></div>
+                </details>
+            </div>
+        </main>
+
+        <footer>
+            <p>Powered by Claude AI</p>
+        </footer>
+    </div>
+
+    <script>
+        const urlInput = document.getElementById('youtube-url');
+        const summarizeBtn = document.getElementById('summarize-btn');
+        const btnText = summarizeBtn.querySelector('.btn-text');
+        const btnLoading = summarizeBtn.querySelector('.btn-loading');
+        const errorMessage = document.getElementById('error-message');
+        const result = document.getElementById('result');
+        const videoLink = document.getElementById('video-link');
+        const summaryContent = document.getElementById('summary-content');
+        const transcriptContent = document.getElementById('transcript-content');
+
+        // Store current video data for download
+        let currentVideoData = null;
+
+        // Allow Enter key to submit
+        urlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                summarize();
+            }
+        });
+
+        async function summarize() {
+            const url = urlInput.value.trim();
+
+            if (!url) {
+                showError('Please enter a YouTube URL');
+                return;
+            }
+
+            // Show loading state
+            setLoading(true);
+            hideError();
+            result.style.display = 'none';
+
+            try {
+                const response = await fetch('/summarize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ url })
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    showError(data.error || 'An error occurred');
+                    return;
+                }
+
+                // Store data for download
+                currentVideoData = {
+                    video_id: data.video_id,
+                    transcript: data.transcript,
+                    summary: data.summary,
+                    url: url
+                };
+
+                // Display results
+                videoLink.href = `https://www.youtube.com/watch?v=${data.video_id}`;
+                summaryContent.innerHTML = formatMarkdown(data.summary);
+                transcriptContent.textContent = data.transcript;
+                result.style.display = 'block';
+
+            } catch (error) {
+                showError('Failed to connect to server. Please try again.');
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function downloadTranscript() {
+            if (!currentVideoData) return;
+
+            const markdown = `# YouTube Video Transcript
+
+**Video URL:** https://www.youtube.com/watch?v=${currentVideoData.video_id}
+
+---
+
+## Summary
+
+${currentVideoData.summary}
+
+---
+
+## Full Transcript
+
+${currentVideoData.transcript}
+`;
+
+            const blob = new Blob([markdown], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `youtube-transcript-${currentVideoData.video_id}.md`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function setLoading(loading) {
+            summarizeBtn.disabled = loading;
+            urlInput.disabled = loading;
+            btnText.style.display = loading ? 'none' : 'inline';
+            btnLoading.style.display = loading ? 'inline-flex' : 'none';
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+
+        function formatMarkdown(text) {
+            // Process line by line for better control
+            const lines = text.split('\n');
+            let html = '';
+            let inList = false;
+            let listType = null;
+
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i];
+
+                // Bold
+                line = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+                // Italic (but not bullet points)
+                line = line.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
+
+                // Headers
+                if (line.match(/^### (.+)$/)) {
+                    if (inList) { html += listType === 'ul' ? '</ul>' : '</ol>'; inList = false; }
+                    html += line.replace(/^### (.+)$/, '<h4>$1</h4>');
+                } else if (line.match(/^## (.+)$/)) {
+                    if (inList) { html += listType === 'ul' ? '</ul>' : '</ol>'; inList = false; }
+                    html += line.replace(/^## (.+)$/, '<h3>$1</h3>');
+                } else if (line.match(/^# (.+)$/)) {
+                    if (inList) { html += listType === 'ul' ? '</ul>' : '</ol>'; inList = false; }
+                    html += line.replace(/^# (.+)$/, '<h2>$1</h2>');
+                }
+                // Bullet points
+                else if (line.match(/^[-*] (.+)$/)) {
+                    if (!inList || listType !== 'ul') {
+                        if (inList) html += '</ol>';
+                        html += '<ul>';
+                        inList = true;
+                        listType = 'ul';
+                    }
+                    html += line.replace(/^[-*] (.+)$/, '<li>$1</li>');
+                }
+                // Numbered lists
+                else if (line.match(/^\d+\. (.+)$/)) {
+                    if (!inList || listType !== 'ol') {
+                        if (inList) html += '</ul>';
+                        html += '<ol>';
+                        inList = true;
+                        listType = 'ol';
+                    }
+                    html += line.replace(/^\d+\. (.+)$/, '<li>$1</li>');
+                }
+                // Empty line
+                else if (line.trim() === '') {
+                    if (inList) { html += listType === 'ul' ? '</ul>' : '</ol>'; inList = false; }
+                    html += '<br>';
+                }
+                // Regular paragraph
+                else {
+                    if (inList) { html += listType === 'ul' ? '</ul>' : '</ol>'; inList = false; }
+                    html += '<p>' + line + '</p>';
+                }
+            }
+
+            // Close any open list
+            if (inList) {
+                html += listType === 'ul' ? '</ul>' : '</ol>';
+            }
+
+            return html;
+        }
+    </script>
+</body>
+</html>

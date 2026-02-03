@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Summarizer</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>YouTube Summarizer</h1>
+        </header>
+
+        <div id="not-youtube" class="message" style="display: none;">
+            <p>Navigate to a YouTube video to use this extension.</p>
+        </div>
+
+        <div id="video-detected" style="display: none;">
+            <div class="video-info">
+                <p class="video-id">Video ID: <span id="current-video-id"></span></p>
+            </div>
+
+            <div class="actions">
+                <button id="summarize-btn" class="btn btn-primary">
+                    <span class="btn-text">Summarize Video</span>
+                    <span class="btn-loading" style="display: none;">
+                        <span class="spinner"></span>
+                        Processing...
+                    </span>
+                </button>
+                <button id="download-btn" class="btn btn-secondary" disabled>
+                    Download Transcript (.md)
+                </button>
+            </div>
+
+            <div id="error-message" class="error-message" style="display: none;"></div>
+
+            <div id="result" class="result" style="display: none;">
+                <h2>Summary</h2>
+                <div id="summary-content" class="summary-content"></div>
+            </div>
+        </div>
+
+        <div class="settings">
+            <details>
+                <summary>Settings</summary>
+                <div class="settings-content">
+                    <label for="backend-url">Backend URL:</label>
+                    <input type="text" id="backend-url" placeholder="https://your-app.onrender.com">
+                    <button id="save-settings" class="btn btn-small">Save</button>
+                </div>
+            </details>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

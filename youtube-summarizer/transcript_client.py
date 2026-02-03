@@ -1,8 +1,10 @@
 """YouTube transcript fetching client using youtube-transcript-api."""
 
+import os
 import re
 from typing import Optional
 from youtube_transcript_api import YouTubeTranscriptApi
+from youtube_transcript_api.proxies import WebshareProxyConfig
 from youtube_transcript_api._errors import (
     TranscriptsDisabled,
     NoTranscriptFound,
@@ -33,6 +35,23 @@ def extract_video_id(url: str) -> Optional[str]:
     return None
 
 
+def get_youtube_api():
+    """Create YouTubeTranscriptApi instance with proxy if configured."""
+    proxy_username = os.environ.get("WEBSHARE_PROXY_USERNAME")
+    proxy_password = os.environ.get("WEBSHARE_PROXY_PASSWORD")
+
+    if proxy_username and proxy_password:
+        # Use Webshare rotating proxies to avoid YouTube IP blocking
+        proxy_config = WebshareProxyConfig(
+            proxy_username=proxy_username,
+            proxy_password=proxy_password,
+        )
+        return YouTubeTranscriptApi(proxy_config=proxy_config)
+    else:
+        # No proxy configured - works locally but may be blocked on cloud
+        return YouTubeTranscriptApi()
+
+
 def fetch_transcript(url: str) -> dict:
     """Fetch transcript for a YouTube video.
 
@@ -55,8 +74,8 @@ def fetch_transcript(url: str) -> dict:
         }
 
     try:
-        # Create API instance (new API requires instantiation)
-        api = YouTubeTranscriptApi()
+        # Create API instance with optional proxy support
+        api = get_youtube_api()
 
         # Try to get transcript with language fallbacks
         transcript_list = api.list(video_id)

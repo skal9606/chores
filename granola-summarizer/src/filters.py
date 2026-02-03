@@ -43,11 +43,15 @@ def _all_internal(attendees: list[str], internal_domains: list[str]) -> bool:
     if not attendees:
         return False
 
+    # Track if we found any external emails
+    found_any_email = False
+
     for attendee in attendees:
         email = _extract_email(attendee)
         if not email:
             continue
 
+        found_any_email = True
         is_internal = False
         for domain in internal_domains:
             if email.endswith(domain):
@@ -57,7 +61,8 @@ def _all_internal(attendees: list[str], internal_domains: list[str]) -> bool:
         if not is_internal:
             return False
 
-    return True
+    # If no emails were found, don't treat as internal (allow the meeting)
+    return found_any_email
 
 
 def _is_vc_meeting(attendees: list[str], vc_patterns: list[str]) -> bool:
